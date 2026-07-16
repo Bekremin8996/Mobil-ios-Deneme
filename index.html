@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Günlük Aktivite Asistanım</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="app-header">
+            <div class="header-content">
+                <h1>📝 Günlük Asistanım</h1>
+                <button class="stats-btn" id="statsBtn">📊</button>
+            </div>
+        </header>
+
+        <div class="chat-container" id="chatContainer">
+            <div class="welcome-message">
+                <div class="bot-message">
+                    <div class="message-bubble bot">
+                        <p>Merhaba! 👋</p>
+                        <p>Ben senin günlük aktivite asistanınım. Bugün neler yaptığını bana anlat, ben de onları kategorize edeyim!</p>
+                        <p class="hint">Örnek: "Bugün spor salonuna gittim ve 1 saat koştum"</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-container">
+            <textarea 
+                id="userInput" 
+                placeholder="Bugün ne yaptın? Anlat..." 
+                rows="1"
+                maxlength="500"
+            ></textarea>
+            <button id="sendBtn" class="send-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="modal" id="statsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📊 Aktivite İstatistiklerin</h2>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="time-filter">
+                    <button class="filter-btn active" data-period="week">Bu Hafta</button>
+                    <button class="filter-btn" data-period="month">Bu Ay</button>
+                    <button class="filter-btn" data-period="all">Tümü</button>
+                </div>
+                <div id="statsContent">
+                    <div class="empty-stats">
+                        <p>Henüz kayıtlı aktivite yok 😊</p>
+                        <p>Günlük aktivitelerini paylaşmaya başla!</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="danger-btn" id="clearDataBtn">🗑️ Tüm Verileri Sil</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
