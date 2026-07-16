@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>📝 Renkli Not Defterim</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 100px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        .color-picker {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            animation: slideDown 0.5s ease;
+        }
+
+        .color-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 3px solid white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .color-btn:active {
+            transform: scale(0.9);
+        }
+
+        .color-btn.active {
+            transform: scale(1.15);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            border-width: 4px;
+        }
+
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 600px) {
+            .notes-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .note-card {
+            background: #fef68a;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            position: relative;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            animation: popIn 0.3s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .note-card:active {
+            transform: scale(0.98);
+        }
+
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .note-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .note-time {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+
+        .note-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .note-btn {
+            background: rgba(0,0,0,0.1);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .note-btn:active {
+            transform: scale(0.9);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .note-content {
+            flex: 1;
+            background: transparent;
+            border: none;
+            font-size: 1rem;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            resize: none;
+            outline: none;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .note-content::placeholder {
+            color: rgba(0,0,0,0.4);
+        }
+
+        .add-note-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .add-note-btn:active {
+            transform: scale(0.9);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: white;
+            padding: 60px 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .empty-state .emoji {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        .search-container {
+            max-width: 500px;
+            margin: 0 auto 25px;
+            animation: slideDown 0.5s ease;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 25px;
+            border: 3px solid white;
+            font-size: 1rem;
+            outline: none;
+            background: rgba(255,255,255,0.95);
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .stats {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            opacity: 0.9;
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Color classes */
+        .color-yellow { background: #fef68a; }
+        .color-pink { background: #ffb3d9; }
+        .color-blue { background: #a8d8ff; }
+        .color-green { background: #b4f4b4; }
+        .color-purple { background: #e0c3fc; }
+        .color-orange { background: #ffd4a3; }
+        .color-mint { background: #a8f5e5; }
+        .color-peach { background: #ffc9c9; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            animation: popIn 0.3s ease;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-btn-cancel {
+            background: #e2e8f0;
+            color: #333;
+        }
+
+        .modal-btn-delete {
+            background: #f56565;
+            color: white;
+        }
+
+        .modal-btn:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📝 Renkli Not Defterim</h1>
+        <p>Düşüncelerini renkli notlara dök!</p>
+    </div>
+
+    <div class="search-container">
+        <input type="text" class="search-input" id="searchInput" placeholder="🔍 Notlarda ara...">
+    </div>
+
+    <div class="color-picker" id="colorPicker">
+        <div class="color-btn color-yellow active" data-color="yellow" title="Sarı"></div>
+        <div class="color-btn color-pink" data-color="pink" title="Pembe"></div>
+        <div class="color-btn color-blue" data-color="blue" title="Mavi"></div>
+        <div class="color-btn color-green" data-color="green" title="Yeşil"></div>
+        <div class="color-btn color-purple" data-color="purple" title="Mor"></div>
+        <div class="color-btn color-orange" data-color="orange" title="Turuncu"></div>
+        <div class="color-btn color-mint" data-color="mint" title="Nane"></div>
+        <div class="color-btn color-peach" data-color="peach" title="Şeftali"></div>
+    </div>
+
+    <div class="stats" id="stats">0 not</div>
+
+    <div class="notes-grid" id="notesGrid">
+        <div class="empty-state">
+            <div class="emoji">📝</div>
+            <h2>Henüz not yok!</h2>
+            <p>Sağ alttaki + butonuna tıklayarak ilk notunu oluştur</p>
+        </div>
+    </div>
+
+    <button class="add-note-btn" id="addNoteBtn">+</button>
+
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <h3>🗑️ Notu Silmek İstediğine Emin misin?</h3>
+            <p style="color: #666; margin-top: 10px;">Bu işlem geri alınamaz!</p>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" id="cancelDelete">İptal</button>
+                <button class="modal-btn modal-btn-delete" id="confirmDelete">Sil</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class ColorfulNotes {
+            constructor() {
+                this.notes = this.loadNotes();
+                this.selectedColor = 'yellow';
+                this.deleteNoteId = null;
+                this.searchTerm = '';
+                
+                this.initializeElements();
+                this.attachEventListeners();
+                this.renderNotes();
+            }
+
+            initializeElements() {
+                this.notesGrid = document.getElementById('notesGrid');
+                this.addNoteBtn = document.getElementById('addNoteBtn');
+                this.colorPicker = document.getElementById('colorPicker');
+                this.searchInput = document.getElementById('searchInput');
+                this.stats = document.getElementById('stats');
+                this.deleteModal = document.getElementById('deleteModal');
+                this.cancelDelete = document.getElementById('cancelDelete');
+                this.confirmDelete = document.getElementById('confirmDelete');
+            }
+
+            attachEventListeners() {
+                this.addNoteBtn.addEventListener('click', () => this.addNote());
+                
+                this.colorPicker.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('color-btn')) {
+                        document.querySelectorAll('.color-btn').forEach(btn => 
+                            btn.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.selectedColor = e.target.dataset.color;
+                    }
+                });
+
+                this.searchInput.addEventListener('input', (e) => {
+                    this.searchTerm = e.target.value.toLowerCase();
+                    this.renderNotes();
+                });
+
+                this.cancelDelete.addEventListener('click', () => this.closeDeleteModal());
+                this.confirmDelete.addEventListener('click', () => this.deleteNoteConfirmed());
+                this.deleteModal.addEventListener('click', (e) => {
+                    if (e.target === this.deleteModal) this.closeDeleteModal();
+                });
+            }
+
+            addNote() {
+                const note = {
+                    id: Date.now(),
+                    content: '',
+                    color: this.selectedColor,
+                    timestamp: new Date().toISOString(),
+                    date: new Date().toLocaleDateString('tr-TR', { 
+                        day: '2-digit', 
+                        month: 'short',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })
+                };
+
+                this.notes.unshift(note);
+                this.saveNotes();
+                this.renderNotes();
+
+                setTimeout(() => {
+                    const textarea = document.querySelector(`[data-note-id="${note.id}"]`);
+                    if (textarea) textarea.focus();
+                }, 100);
+            }
+
+            updateNote(id, content) {
+                const note = this.notes.find(n => n.id === id);
+                if (note) {
+                    note.content = content;
+                    note.timestamp = new Date().toISOString();
+                    note.date = new Date().toLocaleDateString('tr-TR', { 
+                        day: '2-digit', 
+                        month: 'short',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    this.saveNotes();
+                }
+            }
+
+            showDeleteModal(id) {
+                this.deleteNoteId = id;
+                this.deleteModal.classList.add('active');
+            }
+
+            closeDeleteModal() {
+                this.deleteModal.classList.remove('active');
+                this.deleteNoteId = null;
+            }
+
+            deleteNoteConfirmed() {
+                if (this.deleteNoteId) {
+                    this.notes = this.notes.filter(n => n.id !== this.deleteNoteId);
+                    this.saveNotes();
+                    this.renderNotes();
+                    this.closeDeleteModal();
+                }
+            }
+
+            changeNoteColor(id, color) {
+                const note = this.notes.find(n => n.id === id);
+                if (note) {
+                    note.color = color;
+                    this.saveNotes();
+                    this.renderNotes();
+                }
+            }
+
+            renderNotes() {
+                const filteredNotes = this.searchTerm 
+                    ? this.notes.filter(note => 
+                        note.content.toLowerCase().includes(this.searchTerm))
+                    : this.notes;
+
+                this.updateStats(filteredNotes.length);
+
+                if (filteredNotes.length === 0) {
+                    this.notesGrid.innerHTML = `
+                        <div class="empty-state">
+                            <div class="emoji">${this.searchTerm ? '🔍' : '📝'}</div>
+                            <h2>${this.searchTerm ? 'Not bulunamadı!' : 'Henüz not yok!'}</h2>
+                            <p>${this.searchTerm ? 'Arama kriterlerine uygun not yok' : 'Sağ alttaki + butonuna tıklayarak ilk notunu oluştur'}</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                this.notesGrid.innerHTML = filteredNotes.map(note => `
+                    <div class="note-card color-${note.color}">
+                        <div class="note-header">
+                            <span class="note-time">${note.date}</span>
+                            <div class="note-actions">
+                                <button class="note-btn" onclick="notesApp.showColorMenu(${note.id})" title="Renk değiştir">🎨</button>
+                                <button class="note-btn" onclick="notesApp.showDeleteModal(${note.id})" title="Sil">🗑️</button>
+                            </div>
+                        </div>
+                        <textarea 
+                            class="note-content" 
+                            data-note-id="${note.id}"
+                            placeholder="Notunu buraya yaz..."
+                            oninput="notesApp.updateNote(${note.id}, this.value)"
+                        >${note.content}</textarea>
+                    </div>
+                `).join('');
+            }
+
+            showColorMenu(id) {
+                const colors = ['yellow', 'pink', 'blue', 'green', 'purple', 'orange', 'mint', 'peach'];
+                const colorEmojis = {
+                    yellow: '💛', pink: '💗', blue: '💙', green: '💚',
+                    purple: '💜', orange: '🧡', mint: '💚', peach: '🧡'
+                };
+                
+                const colorOptions = colors.map(c => 
+                    `<button class="note-btn" onclick="notesApp.changeNoteColor(${id}, '${c}')" style="background: var(--color-${c})">${colorEmojis[c]}</button>`
+                ).join('');
+
+                // Simple color change without modal
+                const currentColor = this.notes.find(n => n.id === id).color;
+                const currentIndex = colors.indexOf(currentColor);
+                const nextColor = colors[(currentIndex + 1) % colors.length];
+                this.changeNoteColor(id, nextColor);
+            }
+
+            updateStats(count) {
+                this.stats.textContent = count === 0 ? '0 not' : 
+                    count === 1 ? '1 not' : `${count} not`;
+            }
+
+            loadNotes() {
+                try {
+                    const stored = localStorage.getItem('colorfulNotes');
+                    return stored ? JSON.parse(stored) : [];
+                } catch (e) {
+                    console.error('Error loading notes:', e);
+                    return [];
+                }
+            }
+
+            saveNotes() {
+                try {
+                    localStorage.setItem('colorfulNotes', JSON.stringify(this.notes));
+                } catch (e) {
+                    console.error('Error saving notes:', e);
+                }
+            }
+        }
+
+        const notesApp = new ColorfulNotes();
+    </script>
+</body>
+</html>
